@@ -11,8 +11,6 @@ namespace Client
 
         //const string SERVER_ADDRESS = "http://epruizhsa0001t2:8080/codenjoy-contest/board/player/4ol1pue9vqijd518yjlb?code=1180389975885916399&gameName=snakebattle";
 
-        private static readonly GameBoardHandler _gameBoardHandler = new GameBoardHandler();
-
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.Unicode;
@@ -25,7 +23,7 @@ namespace Client
 
         private static SnakeAction DoRun(GameBoard gameBoard)
         {
-            return _gameBoardHandler.Handle(gameBoard);
+            return Solver.Solve(gameBoard);
 
             var random = new Random();
             var direction = (Direction)random.Next(Enum.GetValues(typeof(Direction)).Length);

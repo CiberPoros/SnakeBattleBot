@@ -17,6 +17,8 @@ namespace Client
             Console.Clear();
             //Console.SetCursorPosition(0, 0);
             gameBoard.PrintBoard();
+            if (SnakeBattle.Logic.GameSettings.MakeLog)
+                gameBoard.PrintBoardToFile("log.txt");
 
             var action = _callback(gameBoard).ToString();
             Console.WriteLine(action);

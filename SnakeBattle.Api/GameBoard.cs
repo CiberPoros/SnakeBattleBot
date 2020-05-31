@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using static SnakeBattle.Api.BoardElement;
 
 namespace SnakeBattle.Api
@@ -111,6 +113,17 @@ namespace SnakeBattle.Api
             {
                 Console.WriteLine(BoardString.Substring(i * Size, Size));
             }
+        }
+
+        public void PrintBoardToFile(string filename)
+        {
+            List<string> ls = new List<string>();
+            for (int i = 0; i < Size; i++)
+            {
+                ls.Add(BoardString.Substring(i * Size, Size));
+            }
+
+            File.AppendAllLines(filename, ls, Encoding.Default);
         }
 
         public BoardPoint? FindElement(BoardElement elementType)

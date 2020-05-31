@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SnakeBattle.Api;
 
-namespace SnakeBattle.Logic
+namespace SnakeBattle.Logic.Extensions
 {
     internal static class DirectionExtensions
     {

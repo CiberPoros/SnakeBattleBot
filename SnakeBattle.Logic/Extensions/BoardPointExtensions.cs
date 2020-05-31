@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SnakeBattle.Api;
 
-namespace SnakeBattle.Logic
+namespace SnakeBattle.Logic.Extensions
 {
     internal static class BoardPointExtensions
     {
@@ -17,5 +17,11 @@ namespace SnakeBattle.Logic
                 Direction.Stop  => boardPoint,
                 _               => throw new ArgumentException(),
             };
+
+        public static bool IsValidPoint(this BoardPoint boardPoint, int size) =>
+            boardPoint.X >= 0
+            && boardPoint.X < size
+            && boardPoint.Y >= 0
+            && boardPoint.Y < size;
     }
 }
