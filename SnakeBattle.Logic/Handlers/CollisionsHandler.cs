@@ -9,7 +9,7 @@ namespace SnakeBattle.Logic.Handlers
 {
     public static class CollisionsHandler
     {
-        public static List<Direction> GetFreeForCollisionDirections(GameBoard gameBoard, Direction[] directions = null)
+        public static List<Direction> GetFreeForCollisionDirections(GameBoard gameBoard, EnemyPart?[,] enemyParts, Direction[] directions = null)
         {
             List<Direction> res = new List<Direction>();
             bool isEvil = MySnakeParameters.EvilsDuration >= 1;
@@ -20,18 +20,27 @@ namespace SnakeBattle.Logic.Handlers
                 var point = MySnakeParameters.Head.Shift(dir);
 
                 bool canMakeCollision = false;
-                foreach (var dir2 in dirs)
+                foreach (var dir2 in new Direction[] { Direction.Down, Direction.Left, Direction.Right, Direction.Stop, Direction.Up })
                 {
-                    var element = gameBoard.GetElementAt(point.Shift(dir2));
+                    var nextPoint = point.Shift(dir2);
+                    var element = gameBoard.GetElementAt(nextPoint);
 
                     if (isEvil)
                     {
-                        canMakeCollision = element == BoardElement.EnemyHeadEvil;
+                        if (element == BoardElement.EnemyHeadEvil)
+                        {
+                            canMakeCollision = element == BoardElement.EnemyHeadEvil
+                                && enemyParts[nextPoint.X, nextPoint.Y] != null
+                                && enemyParts[nextPoint.X, nextPoint.Y].Value.DistanceFromTali + 1 > MySnakeParameters.Length - 2;
+                        }
                     }
                     else
                     {
                         canMakeCollision = element.IsEnemyHead();
                     }
+
+                    if (canMakeCollision)
+                        break;
                 }
 
                 if (!canMakeCollision)

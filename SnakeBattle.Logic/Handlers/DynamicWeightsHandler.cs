@@ -9,7 +9,6 @@ namespace SnakeBattle.Logic.Handlers
 {
     public static class DynamicWeightsHandler
     {
-        private const int _deepLimit = 15;
         private static int _size;
         private static GameBoard _gameBoard;
         private static long[,] _staticWeights;
@@ -29,14 +28,14 @@ namespace SnakeBattle.Logic.Handlers
             Direction[] dirs = directions ?? GameSettings.Directions;
             foreach (var dir in dirs)
             {
-                long maxWeight = 0;
+                long maxWeight = -1;
                 DistanceFromMyTail = GetDistanceFromMyTail();
 
                 SnakeParameters snakeParameters = new SnakeParameters(MySnakeParameters.Length, MySnakeParameters.StonesCount, MySnakeParameters.EvilsDuration);
 
+                result.Add(dir, -1);
                 CalcMaxWeight(snakeParameters, MySnakeParameters.Head, MySnakeParameters.Head.Shift(dir), ref maxWeight);
-
-                result.Add(dir, maxWeight);
+                result[dir] = maxWeight;
             }
 
             return result;
@@ -53,14 +52,14 @@ namespace SnakeBattle.Logic.Handlers
             if (element == BoardElement.FuryPill)
             {
                 snakeParameters.EvilsDuration += GameSettings.EvilPillTimeDuration;
-                currentWeight += Math.Max(0, (GameSettings.EvilPillWeight
+                currentWeight += Math.Max(0, (_staticWeights[point.X, point.Y]
                     - GameSettings.EvilWeightReducter
-                    * Math.Max(0, snakeParameters.EvilsDuration - GameSettings.EvilTimeDurationForReductEvilWeight))) / deep;
+                    * Math.Max(0, snakeParameters.EvilsDuration - GameSettings.EvilTimeDurationForReductEvilWeight))) / (deep + GameSettings.DeepReducterCoeff);
             }
             if (element == BoardElement.Apple)
             {
                 snakeParameters.Length += GameSettings.AppleLengthBooster;
-                currentWeight += GameSettings.AppleWeight / deep;
+                currentWeight += _staticWeights[point.X, point.Y] / (deep + GameSettings.DeepReducterCoeff);
                 deltaLen++;
             }
             if (element == BoardElement.Stone)
@@ -68,12 +67,12 @@ namespace SnakeBattle.Logic.Handlers
                 if (snakeParameters.EvilsDuration == 0)
                     snakeParameters.Length = Math.Max(snakeParameters.Length - GameSettings.StoneLengthReducter, 0);
 
-                currentWeight += GameSettings.StoneWeight / deep;
+                currentWeight += _staticWeights[point.X, point.Y] / (deep + GameSettings.DeepReducterCoeff);
                 snakeParameters.StonesCount++;
             }
             if (element == BoardElement.Gold)
             {
-                currentWeight += GameSettings.CoinWeight / deep;
+                currentWeight += _staticWeights[point.X, point.Y] / (deep + GameSettings.DeepReducterCoeff);
             }
             if ((element.IsEnemyBody() || element.IsEnemyActiveHead())
                 && _enemyParts[point.X, point.Y] != null
@@ -82,12 +81,12 @@ namespace SnakeBattle.Logic.Handlers
                 attackedSnakesIdMask |= _enemyParts[point.X, point.Y].Value.Id;
                 var coeff = _enemyParts[point.X, point.Y].Value.DistanceFromTali - deep;
                 if (snakeParameters.EvilsDuration > 0)
-                    currentWeight += coeff * GameSettings.EnemyPartOfBodyWeight / deep;
+                    currentWeight += coeff * GameSettings.EnemyPartOfBodyWeight / (deep + GameSettings.DeepReducterCoeff);
             }
 
-            if (deep >= _deepLimit)
+            if (deep >= GameSettings.DeepLimit)
             {
-                maxWeight = Math.Max(maxWeight, currentWeight);
+                maxWeight = Math.Max(maxWeight, currentWeight + 1);
                 return;
             }
 

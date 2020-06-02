@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -18,6 +19,7 @@ namespace SnakeBattle.Logic
         public static SnakeAction Solve(GameBoard gameBoard)
         {
             DateTime start = DateTime.Now;
+            GameSettings.UpdateSettings();
 
             if (DeadAndSleepHandler.IsDeadOrSleep(gameBoard))
             {
@@ -32,11 +34,11 @@ namespace SnakeBattle.Logic
             var freeDirections = FreeDirectionsHandler.GetFreeDirections(gameBoard);
             Log(freeDirections, "Free directions");
 
-            var nonCollisionDirections = CollisionsHandler.GetFreeForCollisionDirections(gameBoard, freeDirections.ToArray());
-            Log(nonCollisionDirections, "Non collision directions");
-
             var enemyPlayersInfo = EnemySnakesHandler.GetEnemyPlayersInfo(gameBoard);
             Log(enemyPlayersInfo, "Enemy players info");
+
+            var nonCollisionDirections = CollisionsHandler.GetFreeForCollisionDirections(gameBoard, enemyPlayersInfo, freeDirections.ToArray());
+            Log(nonCollisionDirections, "Non collision directions");
 
             var staticWeights = StaticWeightsHandler.GetStaticWeights(gameBoard);
             Log(staticWeights, "Static weights");
@@ -58,11 +60,12 @@ namespace SnakeBattle.Logic
                     direction = kvp.Key;
                 }
 
-            Console.WriteLine("before: " + MySnakeParameters.Length);
-            Console.WriteLine("before time: " + MySnakeParameters.EvilsDuration);
+            Console.WriteLine("Tick number: " + MySnakeParameters.TickNumber);
+            Console.WriteLine("Lingth before: " + MySnakeParameters.Length);
+            Console.WriteLine("Evil time before: " + MySnakeParameters.EvilsDuration);
             MySnakeParameters.UpdateAfterMove(gameBoard, direction);
-            Console.WriteLine("after: " + MySnakeParameters.Length);
-            Console.WriteLine("after time: " + MySnakeParameters.EvilsDuration);
+            Console.WriteLine("Lingth after: " + MySnakeParameters.Length);
+            Console.WriteLine("Evil time after: " + MySnakeParameters.EvilsDuration);
 
             Console.WriteLine((DateTime.Now - start).Milliseconds);
             return new SnakeAction(false, false, direction);

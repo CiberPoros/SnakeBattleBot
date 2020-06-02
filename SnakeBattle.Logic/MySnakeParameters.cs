@@ -17,6 +17,8 @@ namespace SnakeBattle.Logic
         private static int _stonesCount;
         private static readonly List<BoardPoint> _body = new List<BoardPoint>(41);
 
+        public static int TickNumber { get; set; }
+
         public static int EvilsDuration { 
             get => _evilsDuration; 
             private set
@@ -54,6 +56,7 @@ namespace SnakeBattle.Logic
         {
             _evilsDuration = 0;
             _length = 2;
+            TickNumber = 0;
             _body.Clear();
         }
 
@@ -69,6 +72,8 @@ namespace SnakeBattle.Logic
         public static void UpdateAfterMove(GameBoard gameBoard, Direction direction, bool act = false)
         {
             BoardElement boardElement = gameBoard.GetElementAt(Head.Shift(direction));
+
+            TickNumber++;
 
             if (act)
                 StonesCount--;
