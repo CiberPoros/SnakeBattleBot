@@ -36,7 +36,17 @@ namespace SnakeBattle.Logic.Handlers
                     }
                     else
                     {
-                        canMakeCollision = element.IsEnemyHead();
+                        if (element.IsEnemyActiveHead())
+                        {
+                            if (element == BoardElement.EnemyHeadEvil)
+                                canMakeCollision = true;
+                            else
+                            {
+                                canMakeCollision = 
+                                    enemyParts[nextPoint.X, nextPoint.Y] != null 
+                                    && enemyParts[nextPoint.X, nextPoint.Y].Value.DistanceFromTali + 1 > MySnakeParameters.Length - 2;
+                            }
+                        }
                     }
 
                     if (canMakeCollision)

@@ -26,7 +26,11 @@ namespace SnakeBattle.Logic.Handlers
                         if (IsLockByWalls(gameBoard, point))
                             continue;
 
-                        res[i, j] = GetElementWeight(gameBoard.GetElementAt(new BoardPoint(i, j)));
+                        var element = gameBoard.GetElementAt(new BoardPoint(i, j));
+                        if ((element == BoardElement.Apple || element == BoardElement.Gold || element == BoardElement.Stone) && !GameSettings.UpdateStaticWeigths)
+                            continue;
+
+                        res[i, j] = GetElementWeight(element);
                     }
                 }
             }

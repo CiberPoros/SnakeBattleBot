@@ -13,6 +13,7 @@ namespace SnakeBattle.Logic.Handlers
         private static GameBoard _gameBoard;
         private static long[,] _staticWeights;
         private static EnemyPart?[,] _enemyParts;
+        private static int[,] _lengthsFromNearEnemySnake;
 
         public static int[,] DistanceFromMyTail;
 
@@ -23,6 +24,7 @@ namespace SnakeBattle.Logic.Handlers
 
             _staticWeights = StaticWeightsHandler.GetStaticWeights(gameBoard);
             _enemyParts = EnemySnakesHandler.GetEnemyPlayersInfo(gameBoard);
+            _lengthsFromNearEnemySnake = LengthFromEnemySnakesHandler.GetLengthsFromNearEnemySnake(gameBoard);
 
             Dictionary<Direction, long> result = new Dictionary<Direction, long>();
             Direction[] dirs = directions ?? GameSettings.Directions;
@@ -49,20 +51,21 @@ namespace SnakeBattle.Logic.Handlers
             var element = _gameBoard.GetElementAt(point);
 
             snakeParameters.EvilsDuration = Math.Max(0, snakeParameters.EvilsDuration - 1);
-            if (element == BoardElement.FuryPill)
+
+            if (element == BoardElement.FuryPill && (!GameSettings.CheckLengthsFromNearEnemySnakes || _lengthsFromNearEnemySnake[point.X, point.Y] > deep))
             {
                 snakeParameters.EvilsDuration += GameSettings.EvilPillTimeDuration;
-                currentWeight += Math.Max(0, (_staticWeights[point.X, point.Y]
+                currentWeight += Math.Max(GameSettings.MultyWeight / 5, (_staticWeights[point.X, point.Y]
                     - GameSettings.EvilWeightReducter
                     * Math.Max(0, snakeParameters.EvilsDuration - GameSettings.EvilTimeDurationForReductEvilWeight))) / (deep + GameSettings.DeepReducterCoeff);
             }
-            if (element == BoardElement.Apple)
+            if (element == BoardElement.Apple && (!GameSettings.CheckLengthsFromNearEnemySnakes || _lengthsFromNearEnemySnake[point.X, point.Y] > deep))
             {
                 snakeParameters.Length += GameSettings.AppleLengthBooster;
                 currentWeight += _staticWeights[point.X, point.Y] / (deep + GameSettings.DeepReducterCoeff);
                 deltaLen++;
             }
-            if (element == BoardElement.Stone)
+            if (element == BoardElement.Stone && (!GameSettings.CheckLengthsFromNearEnemySnakes || _lengthsFromNearEnemySnake[point.X, point.Y] > deep))
             {
                 if (snakeParameters.EvilsDuration == 0)
                     snakeParameters.Length = Math.Max(snakeParameters.Length - GameSettings.StoneLengthReducter, 0);
@@ -70,7 +73,7 @@ namespace SnakeBattle.Logic.Handlers
                 currentWeight += _staticWeights[point.X, point.Y] / (deep + GameSettings.DeepReducterCoeff);
                 snakeParameters.StonesCount++;
             }
-            if (element == BoardElement.Gold)
+            if (element == BoardElement.Gold && (!GameSettings.CheckLengthsFromNearEnemySnakes || _lengthsFromNearEnemySnake[point.X, point.Y] > deep))
             {
                 currentWeight += _staticWeights[point.X, point.Y] / (deep + GameSettings.DeepReducterCoeff);
             }

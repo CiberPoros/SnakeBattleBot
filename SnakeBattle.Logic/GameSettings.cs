@@ -8,9 +8,11 @@ namespace SnakeBattle.Logic
 {
     public static class GameSettings
     {
-        public static long MultyWeight = 8 * 9 * 10 * 11 * 12 * 13 * 14 * 15;
-        public static bool MakeLog = false;
-        public static bool CheckCollisions = true;
+        public static long MultyWeight = 8 * 9 * 10 * 11 * 12 * 13 * 14 * 15; // коеффициент для невиляции потери данных при делении на редуктеры
+        public static bool MakeLog = false; // делаем лог или нет
+        public static bool CheckCollisions = true; // проверять, будет ли лобовое столкновение или нет
+        public static bool CheckLengthsFromNearEnemySnakes = true; // изменять веса статических объектов, если вражина к ним намного ближе, чем я
+        public static bool UpdateStaticWeigths = true; 
 
         public static long AppleWeight = 10; // поиграться с этим
         public static long EvilPillWeight = 18 * 8 * 9 * 10 * 11 * 12 * 13 * 14; // поиграться с этим
@@ -42,6 +44,8 @@ namespace SnakeBattle.Logic
             MultyWeight = long.Parse(ConfigurationManager.AppSettings.Get("MultyWeight"));
             MakeLog = bool.Parse(ConfigurationManager.AppSettings.Get("MakeLog"));
             CheckCollisions = bool.Parse(ConfigurationManager.AppSettings.Get("CheckCollisions"));
+            CheckLengthsFromNearEnemySnakes = bool.Parse(ConfigurationManager.AppSettings.Get("CheckLengthsFromNearEnemySnakes"));
+            UpdateStaticWeigths = bool.Parse(ConfigurationManager.AppSettings.Get("UpdateStaticWeigths"));
 
             AppleWeight = long.Parse(ConfigurationManager.AppSettings.Get("AppleWeight")) * MultyWeight;
             EvilPillWeight = long.Parse(ConfigurationManager.AppSettings.Get("EvilPillWeight")) * MultyWeight;
